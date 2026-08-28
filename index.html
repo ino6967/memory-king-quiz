@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>記憶RPG メモリア王国</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Cinzel:wght@500;600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="stage-frame flicker">
+  <div class="wordmark">Memoria &middot; The Forgotten Crown</div>
+  <div class="rule"><span class="diamond"></span></div>
+
+  <main id="app" class="card">
+    <span class="card-corner tl"></span><span class="card-corner tr"></span>
+    <span class="card-corner bl"></span><span class="card-corner br"></span>
+
+    <section id="screen-title" class="screen active">
+      <div class="scene-frame scene-frame-sm">
+        <canvas id="title-scene" class="scene-canvas" width="120" height="120"></canvas>
+      </div>
+      <h1>メモリア王国</h1>
+      <p class="lead">
+        王家の血脈を、限られた刻のうちに記憶せよ。<br />
+        王の御前にて答えを違えれば――沙汰は下る。
+      </p>
+      <button id="btn-start" class="btn">試練をはじめる</button>
+    </section>
+
+    <section id="screen-board" class="screen">
+      <div class="scene-frame">
+        <canvas id="board-scene" class="scene-canvas" width="220" height="120"></canvas>
+      </div>
+      <div class="hud">
+        <span class="hud-label">記憶せよ</span>
+        <div class="timer-track"><div id="timer-fill" class="timer-fill"></div></div>
+        <span id="timer-text" class="timer-text">60</span>
+      </div>
+      <div class="board-heading">
+        <span id="stage-tag" class="stage-tag">STAGE 1</span>
+        <h1 id="board-title">王家の人々</h1>
+      </div>
+      <div id="board-people" class="board-people"></div>
+    </section>
+
+    <section id="screen-king" class="screen">
+      <div id="king-scene-frame" class="scene-frame">
+        <canvas id="king-scene" class="scene-canvas" width="220" height="140"></canvas>
+        <div id="king-flash" class="scene-flash"></div>
+      </div>
+      <div id="king-line" class="king-line">王「さて、勇者よ……」</div>
+      <div id="dots" class="dots"></div>
+      <h2 id="question-text" class="question-text"></h2>
+      <div id="choices" class="choices"></div>
+    </section>
+
+    <section id="screen-clear" class="screen">
+      <div class="scene-frame scene-frame-sm">
+        <canvas id="clear-scene" class="scene-canvas" width="120" height="120"></canvas>
+      </div>
+      <div class="clear-mark" id="clear-mark">STAGE CLEAR</div>
+      <h1 id="clear-heading">記憶、証明さる</h1>
+      <p id="clear-line" class="king-line"></p>
+      <button id="btn-clear-continue" class="btn">次のステージへ</button>
+    </section>
+
+    <section id="screen-over" class="screen">
+      <div class="scene-frame scene-frame-sm">
+        <canvas id="over-scene" class="scene-canvas" width="120" height="120"></canvas>
+      </div>
+      <div class="over-mark">GUILTY</div>
+      <h1 class="over-title">沙汰は、死罪</h1>
+      <p id="over-line" class="king-line"></p>
+      <button id="btn-retry" class="btn btn-ghost">もう一度挑む</button>
+    </section>
+  </main>
+
+  <p class="foot-note">世界観データベース(world-db.json)を唯一の正解ソースとする出題ロジック</p>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "memory-king-quiz",
+  "version": "0.1.0",
+  "private": true,
+  "description": "記憶RPG「アストリア王国」初回プロトタイプ",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

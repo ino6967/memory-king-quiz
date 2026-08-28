@@ -1,0 +1,180 @@
+{
+  "kingdom": "メモリア王国",
+  "note": "このファイルがゲーム内の唯一の正解ソース(正史)である。ここにない事実を出題・正解として扱ってはならない。",
+  "canonRules": [
+    "親子関係を変更しない",
+    "兄弟姉妹関係を変更しない",
+    "年代を変更しない",
+    "人物の所属を変更しない",
+    "地理関係を変更しない",
+    "死亡人物を勝手に復活させない",
+    "DBにない人物を正解として出題しない",
+    "問題の正解は必ずDB上の事実から導き出す",
+    "新しい設定を追加する場合はDBを更新してからゲームへ反映する"
+  ],
+  "kingLines": {
+    "correct": [
+      "ほう。正解じゃ。",
+      "よく覚えておったな、勇者よ。",
+      "なかなか見込みがあるではないか。",
+      "わしの家系をわし以上に覚えておるではないか。"
+    ],
+    "incorrect": [
+      "……違う。",
+      "勇者よ。貴様、何も覚えておらぬな?",
+      "残念じゃ。",
+      "死刑じゃ。",
+      "衛兵!この勇者を連れていけ!",
+      "黙れ黙れ黙れ!口答えは許さぬ!",
+      "無礼者めが、頭を垂れよ!",
+      "貴様のような愚か者は要らぬ!"
+    ],
+    "ominous": [
+      "……昔のことは、思い出さずともよい。",
+      "英雄、か。都合のいい呼び名よのう。",
+      "忘れられた者の話は、せんでよい。",
+      "抵抗、か。……懐かしい響きじゃ。",
+      "記憶とは、都合よく作れるものよ。",
+      "そなたも、いずれ都合よく忘れられような。"
+    ]
+  },
+  "people": {
+    "aldin": {
+      "id": "aldin",
+      "name": "アルディン三世",
+      "title": "国王",
+      "gender": "male",
+      "fatherId": "oswald",
+      "motherId": "magdalena",
+      "spouseId": "celestia",
+      "childIds": ["leonhardt", "fiona", "wilhelm"],
+      "siblingIds": ["godwin", "isabella"]
+    },
+    "celestia": {
+      "id": "celestia",
+      "name": "セレスティア",
+      "title": "王妃",
+      "gender": "female",
+      "fatherId": null,
+      "motherId": null,
+      "spouseId": "aldin",
+      "childIds": ["leonhardt", "fiona", "wilhelm"],
+      "siblingIds": []
+    },
+    "leonhardt": {
+      "id": "leonhardt",
+      "name": "レオンハルト",
+      "title": "第一王子",
+      "gender": "male",
+      "fatherId": "aldin",
+      "motherId": "celestia",
+      "spouseId": null,
+      "childIds": [],
+      "siblingIds": ["fiona", "wilhelm"]
+    },
+    "fiona": {
+      "id": "fiona",
+      "name": "フィオナ",
+      "title": "第一王女",
+      "gender": "female",
+      "fatherId": "aldin",
+      "motherId": "celestia",
+      "spouseId": null,
+      "childIds": [],
+      "siblingIds": ["leonhardt", "wilhelm"]
+    },
+    "wilhelm": {
+      "id": "wilhelm",
+      "name": "ヴィルヘルム",
+      "title": "第二王子",
+      "gender": "male",
+      "fatherId": "aldin",
+      "motherId": "celestia",
+      "spouseId": null,
+      "childIds": [],
+      "siblingIds": ["leonhardt", "fiona"]
+    },
+    "godwin": {
+      "id": "godwin",
+      "name": "ゴドウィン",
+      "title": "王弟",
+      "gender": "male",
+      "fatherId": "oswald",
+      "motherId": "magdalena",
+      "spouseId": "marianne",
+      "childIds": [],
+      "siblingIds": ["aldin", "isabella"]
+    },
+    "marianne": {
+      "id": "marianne",
+      "name": "マリアンヌ",
+      "title": "王弟妃",
+      "gender": "female",
+      "fatherId": null,
+      "motherId": null,
+      "spouseId": "godwin",
+      "childIds": [],
+      "siblingIds": []
+    },
+    "isabella": {
+      "id": "isabella",
+      "name": "イザベラ",
+      "title": "王妹",
+      "gender": "female",
+      "fatherId": "oswald",
+      "motherId": "magdalena",
+      "spouseId": null,
+      "childIds": [],
+      "siblingIds": ["aldin", "godwin"]
+    },
+    "oswald": {
+      "id": "oswald",
+      "name": "オズワルド二世",
+      "title": "先王",
+      "gender": "male",
+      "fatherId": null,
+      "motherId": null,
+      "spouseId": "magdalena",
+      "childIds": ["aldin", "godwin", "isabella"],
+      "siblingIds": []
+    },
+    "magdalena": {
+      "id": "magdalena",
+      "name": "マグダレーナ",
+      "title": "先王妃",
+      "gender": "female",
+      "fatherId": null,
+      "motherId": null,
+      "spouseId": "oswald",
+      "childIds": ["aldin", "godwin", "isabella"],
+      "siblingIds": []
+    }
+  },
+  "stageOrder": ["stage1", "stage2"],
+  "stages": {
+    "stage1": {
+      "id": "stage1",
+      "stageNumber": 1,
+      "name": "王家の人々",
+      "description": "現王家の人々の続柄を記憶せよ。",
+      "memorizeSeconds": 60,
+      "questionCount": 3,
+      "peopleIds": [
+        "aldin", "celestia", "leonhardt", "fiona", "wilhelm",
+        "godwin", "marianne", "isabella"
+      ]
+    },
+    "stage2": {
+      "id": "stage2",
+      "stageNumber": 2,
+      "name": "王家の血筋",
+      "description": "現王家に先代王家(先王・先王妃)を加えて記憶せよ。",
+      "memorizeSeconds": 90,
+      "questionCount": 3,
+      "peopleIds": [
+        "aldin", "celestia", "leonhardt", "fiona", "wilhelm",
+        "godwin", "marianne", "isabella", "oswald", "magdalena"
+      ]
+    }
+  }
+}
