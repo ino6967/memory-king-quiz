@@ -1,0 +1,129 @@
+{
+  "kingdom": "アストリア王国",
+  "note": "このファイルがゲーム内の唯一の正解ソース(正史)である。ここにない事実を出題・正解として扱ってはならない。",
+  "canonRules": [
+    "親子関係を変更しない",
+    "兄弟姉妹関係を変更しない",
+    "年代を変更しない",
+    "人物の所属を変更しない",
+    "地理関係を変更しない",
+    "死亡人物を勝手に復活させない",
+    "DBにない人物を正解として出題しない",
+    "問題の正解は必ずDB上の事実から導き出す",
+    "新しい設定を追加する場合はDBを更新してからゲームへ反映する"
+  ],
+  "kingLines": {
+    "correct": [
+      "ほう。正解じゃ。",
+      "よく覚えておったな、勇者よ。",
+      "なかなか見込みがあるではないか。",
+      "わしの家系をわし以上に覚えておるではないか。"
+    ],
+    "incorrect": [
+      "……違う。",
+      "勇者よ。貴様、何も覚えておらぬな?",
+      "残念じゃ。",
+      "死刑じゃ。",
+      "衛兵!この勇者を連れていけ!"
+    ]
+  },
+  "stages": {
+    "stage1": {
+      "id": "stage1",
+      "name": "王家の人々",
+      "description": "現王家の人々の続柄を記憶せよ。",
+      "memorizeSeconds": 60,
+      "questionCount": 3,
+      "people": [
+        {
+          "id": "aldin",
+          "name": "アルディン三世",
+          "title": "国王",
+          "gender": "male",
+          "fatherId": null,
+          "motherId": null,
+          "spouseId": "celestia",
+          "childIds": ["leonhardt", "fiona", "wilhelm"],
+          "siblingIds": ["godwin", "isabella"]
+        },
+        {
+          "id": "celestia",
+          "name": "セレスティア",
+          "title": "王妃",
+          "gender": "female",
+          "fatherId": null,
+          "motherId": null,
+          "spouseId": "aldin",
+          "childIds": ["leonhardt", "fiona", "wilhelm"],
+          "siblingIds": []
+        },
+        {
+          "id": "leonhardt",
+          "name": "レオンハルト",
+          "title": "第一王子",
+          "gender": "male",
+          "fatherId": "aldin",
+          "motherId": "celestia",
+          "spouseId": null,
+          "childIds": [],
+          "siblingIds": ["fiona", "wilhelm"]
+        },
+        {
+          "id": "fiona",
+          "name": "フィオナ",
+          "title": "第一王女",
+          "gender": "female",
+          "fatherId": "aldin",
+          "motherId": "celestia",
+          "spouseId": null,
+          "childIds": [],
+          "siblingIds": ["leonhardt", "wilhelm"]
+        },
+        {
+          "id": "wilhelm",
+          "name": "ヴィルヘルム",
+          "title": "第二王子",
+          "gender": "male",
+          "fatherId": "aldin",
+          "motherId": "celestia",
+          "spouseId": null,
+          "childIds": [],
+          "siblingIds": ["leonhardt", "fiona"]
+        },
+        {
+          "id": "godwin",
+          "name": "ゴドウィン",
+          "title": "王弟",
+          "gender": "male",
+          "fatherId": null,
+          "motherId": null,
+          "spouseId": "marianne",
+          "childIds": [],
+          "siblingIds": ["aldin", "isabella"]
+        },
+        {
+          "id": "marianne",
+          "name": "マリアンヌ",
+          "title": "王弟妃",
+          "gender": "female",
+          "fatherId": null,
+          "motherId": null,
+          "spouseId": "godwin",
+          "childIds": [],
+          "siblingIds": []
+        },
+        {
+          "id": "isabella",
+          "name": "イザベラ",
+          "title": "王妹",
+          "gender": "female",
+          "fatherId": null,
+          "motherId": null,
+          "spouseId": null,
+          "childIds": [],
+          "siblingIds": ["aldin", "godwin"]
+        }
+      ]
+    }
+  }
+}

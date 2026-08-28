@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>記憶RPG アストリア王国</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<main id="app">
+
+  <section id="screen-title" class="screen active">
+    <h1>アストリア王国</h1>
+    <p class="subtitle">記憶の試練</p>
+    <p class="lead">王家の者を記憶せよ。忘れれば、死刑じゃ。</p>
+    <button id="btn-start" class="btn-primary">はじめる</button>
+  </section>
+
+  <section id="screen-board" class="screen">
+    <div class="hud">
+      <span class="hud-label">記憶せよ</span>
+      <div class="timer-bar"><div id="timer-fill" class="timer-fill"></div></div>
+      <span id="timer-text" class="timer-text">60</span>
+    </div>
+    <h2 id="board-title">王家の人々</h2>
+    <div id="board-people" class="board-people"></div>
+  </section>
+
+  <section id="screen-king" class="screen">
+    <div class="king-room">
+      <div class="king-portrait">👑</div>
+      <div id="king-line" class="king-line">王「さて、勇者よ……」</div>
+      <div class="progress" id="question-progress"></div>
+      <h2 id="question-text" class="question-text"></h2>
+      <div id="choices" class="choices"></div>
+    </div>
+  </section>
+
+  <section id="screen-clear" class="screen">
+    <h1>ステージクリア!</h1>
+    <p id="clear-line" class="king-line"></p>
+    <button id="btn-clear-continue" class="btn-primary">タイトルへ戻る</button>
+  </section>
+
+  <section id="screen-over" class="screen">
+    <h1 class="over-title">GAME OVER</h1>
+    <p id="over-line" class="king-line"></p>
+    <button id="btn-retry" class="btn-primary">もう一度挑む</button>
+  </section>
+
+</main>
+<script src="game.js"></script>
+</body>
+</html>
