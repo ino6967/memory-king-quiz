@@ -36,11 +36,18 @@ let DB = null;
 let currentStage = null;
 let peopleById = null;
 let timerHandle = null;
+let stageIndex = 0;
 
 async function loadDB() {
   const res = await fetch("world-db.json");
   if (!res.ok) throw new Error("world-db.json の読み込みに失敗した");
   return res.json();
+}
+
+function resolveStage(stageId) {
+  const def = DB.stages[stageId];
+  const people = def.peopleIds.map((id) => DB.people[id]);
+  return { ...def, people };
 }
 
 function relLine(label, person) {
@@ -49,7 +56,7 @@ function relLine(label, person) {
 }
 
 function renderBoard(stage) {
-  document.getElementById("board-title").textContent = `STAGE 1: ${stage.name}`;
+  document.getElementById("board-title").textContent = `STAGE ${stage.stageNumber}: ${stage.name}`;
   const container = document.getElementById("board-people");
   container.innerHTML = "";
   for (const p of stage.people) {
@@ -217,7 +224,13 @@ function handleAnswer(clickedBtn, choice, question) {
 }
 
 function clearStage(line) {
+  const hasNextStage = stageIndex + 1 < DB.stageOrder.length;
   document.getElementById("clear-line").textContent = `王「${line}」`;
+  document.getElementById("clear-heading").textContent = hasNextStage
+    ? `STAGE ${currentStage.stageNumber} クリア!`
+    : "全ステージ制覇!";
+  const btn = document.getElementById("btn-clear-continue");
+  btn.textContent = hasNextStage ? "次のステージへ" : "タイトルへ戻る";
   showScreen("clear");
 }
 
@@ -226,16 +239,32 @@ function endGame(line) {
   showScreen("over");
 }
 
+function playStage(id) {
+  currentStage = resolveStage(id);
+  peopleById = Object.fromEntries(currentStage.people.map((p) => [p.id, p]));
+  startMemoryPhase(currentStage);
+}
+
+function onClearContinue() {
+  stageIndex += 1;
+  if (stageIndex < DB.stageOrder.length) {
+    playStage(DB.stageOrder[stageIndex]);
+  } else {
+    showScreen("title");
+  }
+}
+
 // --- boot ---
 
 async function init() {
   DB = await loadDB();
-  currentStage = DB.stages.stage1;
-  peopleById = Object.fromEntries(currentStage.people.map((p) => [p.id, p]));
 
-  document.getElementById("btn-start").addEventListener("click", () => startMemoryPhase(currentStage));
+  document.getElementById("btn-start").addEventListener("click", () => {
+    stageIndex = 0;
+    playStage(DB.stageOrder[stageIndex]);
+  });
   document.getElementById("btn-retry").addEventListener("click", () => showScreen("title"));
-  document.getElementById("btn-clear-continue").addEventListener("click", () => showScreen("title"));
+  document.getElementById("btn-clear-continue").addEventListener("click", onClearContinue);
 }
 
 init().catch((err) => {
