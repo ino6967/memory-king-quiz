@@ -6,6 +6,7 @@ const DEV_MODE = new URLSearchParams(location.search).get("dev") === "1";
 
 const screens = {
   title: document.getElementById("screen-title"),
+  intro: document.getElementById("screen-intro"),
   board: document.getElementById("screen-board"),
   king: document.getElementById("screen-king"),
   clear: document.getElementById("screen-clear"),
@@ -39,6 +40,46 @@ let currentStage = null;
 let peopleById = null;
 let timerHandle = null;
 let stageIndex = 0;
+
+// --- player settings (persisted per-browser; retry pacing only) ---
+
+const SETTINGS_KEY = "memoria-quiz-settings";
+const DEFAULT_SETTINGS = { reMemorizeOnRetry: true };
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return { ...DEFAULT_SETTINGS };
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_SETTINGS, ...parsed };
+  } catch {
+    return { ...DEFAULT_SETTINGS };
+  }
+}
+
+function saveSettings(settings) {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {
+    /* localStorage unavailable; setting stays session-only */
+  }
+}
+
+let settings = loadSettings();
+
+function applySettingsToInputs() {
+  const checkbox = document.getElementById("opt-rememorize");
+  checkbox.checked = settings.reMemorizeOnRetry;
+}
+
+function wireSettingsInputs() {
+  const checkbox = document.getElementById("opt-rememorize");
+  applySettingsToInputs();
+  checkbox.addEventListener("change", () => {
+    settings.reMemorizeOnRetry = checkbox.checked;
+    saveSettings(settings);
+  });
+}
 
 async function loadDB() {
   const res = await fetch("world-db.json");
@@ -76,32 +117,37 @@ function renderBoard(stage) {
       ${relLine("母", mother)}
       ${relLine("配偶者", spouse)}
       ${children.length ? `<div class="rel"><span>子:</span> ${children.map((c) => c.name).join("・")}</div>` : ""}
+      ${p.notes ? `<div class="notes">${p.notes}</div>` : ""}
     `;
     container.appendChild(card);
   }
 }
 
+let memorizePhaseStage = null;
+
 function startMemoryPhase(stage) {
   renderBoard(stage);
   paintBoardScene();
   showScreen("board");
-  const total = DEV_MODE ? 5 : stage.memorizeSeconds;
-  let remaining = total;
-  const fill = document.getElementById("timer-fill");
-  const text = document.getElementById("timer-text");
-  fill.style.width = "100%";
-  text.textContent = String(remaining);
+  memorizePhaseStage = stage;
+
+  let elapsed = 0;
+  const text = document.getElementById("elapsed-text");
+  text.textContent = String(elapsed);
 
   clearInterval(timerHandle);
   timerHandle = setInterval(() => {
-    remaining -= 1;
-    fill.style.width = `${Math.max(0, (remaining / total) * 100)}%`;
-    text.textContent = String(Math.max(0, remaining));
-    if (remaining <= 0) {
-      clearInterval(timerHandle);
-      startQuizPhase(stage);
-    }
+    elapsed += 1;
+    text.textContent = String(elapsed);
   }, 1000);
+}
+
+function confirmMemorized() {
+  if (!memorizePhaseStage) return;
+  clearInterval(timerHandle);
+  const stage = memorizePhaseStage;
+  memorizePhaseStage = null;
+  startQuizPhase(stage);
 }
 
 // --- question templates ---
@@ -241,6 +287,34 @@ function drawKingSprite(ctx, cx, topY, mood, scale) {
     ctx.fillRect(cx + s(3), topY + s(5), s(2), s(2));
     ctx.fillRect(cx - s(3), topY + s(10), s(6), s(2));
   }
+}
+
+function drawHeroSprite(ctx, cx, footY, walkFrame) {
+  const legColor = "#2c2c3a";
+  const tunic = "#3f6b4a";
+  const hair = "#5a3a22";
+  const strap = "#8a5f2d";
+
+  ctx.fillStyle = legColor;
+  if (walkFrame % 2 === 0) {
+    ctx.fillRect(cx - 4, footY - 6, 3, 6);
+    ctx.fillRect(cx + 1, footY - 5, 3, 5);
+  } else {
+    ctx.fillRect(cx - 4, footY - 5, 3, 5);
+    ctx.fillRect(cx + 1, footY - 6, 3, 6);
+  }
+
+  ctx.fillStyle = tunic;
+  ctx.fillRect(cx - 5, footY - 16, 10, 11);
+
+  ctx.fillStyle = strap;
+  ctx.fillRect(cx - 5, footY - 8, 10, 2);
+
+  ctx.fillStyle = PX.skin;
+  ctx.fillRect(cx - 4, footY - 23, 8, 7);
+
+  ctx.fillStyle = hair;
+  ctx.fillRect(cx - 4, footY - 24, 8, 3);
 }
 
 function drawThroneScene(ctx, w, h, mood) {
@@ -388,6 +462,113 @@ function reactScene(mood) {
   flash.classList.add(mood === "angry" ? "flash-bad" : "flash-good", "play");
 }
 
+// --- typewriter text ---
+
+function typewriter(el, text, speed) {
+  speed = speed || 26;
+  if (el._twCancel) el._twCancel();
+  return new Promise((resolve) => {
+    el.textContent = "";
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        clearInterval(id);
+        el._twCancel = null;
+        resolve();
+      }
+    }, speed);
+    el._twCancel = () => {
+      clearInterval(id);
+      el.textContent = text;
+      el._twCancel = null;
+      resolve();
+    };
+  });
+}
+
+function skipTypewriter(el) {
+  if (el._twCancel) el._twCancel();
+}
+
+// --- opening monologue ---
+
+let introState = null;
+
+function playApproach() {
+  const canvas = document.getElementById("intro-scene");
+  if (!canvas) return Promise.resolve();
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  const footY = h - 4;
+  const startX = 16;
+  const endX = w / 2 - 22;
+
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    drawThroneScene(ctx, w, h, "neutral");
+    drawHeroSprite(ctx, endX, footY, 0);
+    return Promise.resolve();
+  }
+
+  const duration = DEV_MODE ? 150 : 1100;
+  return new Promise((resolve) => {
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const x = startX + (endX - startX) * t;
+      drawThroneScene(ctx, w, h, "neutral");
+      drawHeroSprite(ctx, x, footY, Math.floor(now / 150));
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function playIntro() {
+  introState = { lines: DB.kingLines.opening, index: 0, typing: false };
+  showScreen("intro");
+  await playApproach();
+  await showIntroLine();
+}
+
+async function showIntroLine() {
+  const el = document.getElementById("intro-line");
+  const indicator = document.getElementById("intro-indicator");
+  indicator.classList.remove("show");
+  introState.typing = true;
+  const line = introState.lines[introState.index];
+  await typewriter(el, `王「${line}」`, DEV_MODE ? 4 : 26);
+  introState.typing = false;
+  indicator.classList.add("show");
+}
+
+function advanceIntro() {
+  if (!introState) return;
+  const el = document.getElementById("intro-line");
+  if (introState.typing) {
+    skipTypewriter(el);
+    return;
+  }
+  introState.index += 1;
+  if (introState.index >= introState.lines.length) {
+    finishIntro();
+  } else {
+    showIntroLine();
+  }
+}
+
+function finishIntro() {
+  introState = null;
+  stageIndex = 0;
+  playStage(DB.stageOrder[stageIndex]);
+}
+
 // --- quiz phase ---
 
 let quizState = null;
@@ -409,7 +590,7 @@ function startQuizPhase(stage) {
   if (DEV_MODE) window.__getQuiz = () => quizState;
   showScreen("king");
   paintKingScene("neutral");
-  document.getElementById("king-line").textContent = "王「さて、勇者よ。答えてもらおうか。」";
+  typewriter(document.getElementById("king-line"), "王「さて、勇者よ。答えてもらおうか。」", DEV_MODE ? 4 : 22);
   renderQuestion();
 }
 
@@ -447,7 +628,7 @@ function handleAnswer(clickedBtn, choice, question) {
   } else {
     line = pickRandom(DB.kingLines.incorrect);
   }
-  document.getElementById("king-line").textContent = `王「${line}」`;
+  typewriter(document.getElementById("king-line"), `王「${line}」`, DEV_MODE ? 4 : 22);
   reactScene(isCorrect ? "happy" : "angry");
 
   setTimeout(() => {
@@ -468,7 +649,7 @@ function handleAnswer(clickedBtn, choice, question) {
 
 function clearStage(line) {
   const hasNextStage = stageIndex + 1 < DB.stageOrder.length;
-  document.getElementById("clear-line").textContent = `王「${line}」`;
+  typewriter(document.getElementById("clear-line"), `王「${line}」`, DEV_MODE ? 4 : 22);
   document.getElementById("clear-mark").textContent = hasNextStage ? "STAGE CLEAR" : "VICTORY";
   document.getElementById("clear-heading").textContent = hasNextStage
     ? `STAGE ${currentStage.stageNumber} 、記憶、証明さる`
@@ -480,7 +661,7 @@ function clearStage(line) {
 }
 
 function endGame(line) {
-  document.getElementById("over-line").textContent = `王「${line}」`;
+  typewriter(document.getElementById("over-line"), `王「${line}」`, DEV_MODE ? 4 : 22);
   drawBustScene("over-scene", "angry");
   showScreen("over");
 }
@@ -489,6 +670,17 @@ function playStage(id) {
   currentStage = resolveStage(id);
   peopleById = Object.fromEntries(currentStage.people.map((p) => [p.id, p]));
   startMemoryPhase(currentStage);
+}
+
+function retryGame() {
+  stageIndex = 0;
+  currentStage = resolveStage(DB.stageOrder[stageIndex]);
+  peopleById = Object.fromEntries(currentStage.people.map((p) => [p.id, p]));
+  if (settings.reMemorizeOnRetry) {
+    startMemoryPhase(currentStage);
+  } else {
+    startQuizPhase(currentStage);
+  }
 }
 
 function onClearContinue() {
@@ -505,11 +697,15 @@ function onClearContinue() {
 async function init() {
   DB = await loadDB();
 
+  wireSettingsInputs();
+
   document.getElementById("btn-start").addEventListener("click", () => {
-    stageIndex = 0;
-    playStage(DB.stageOrder[stageIndex]);
+    playIntro();
   });
-  document.getElementById("btn-retry").addEventListener("click", () => showScreen("title"));
+  document.getElementById("intro-line").addEventListener("click", advanceIntro);
+  document.getElementById("btn-intro-skip").addEventListener("click", finishIntro);
+  document.getElementById("btn-memorized").addEventListener("click", confirmMemorized);
+  document.getElementById("btn-retry").addEventListener("click", retryGame);
   document.getElementById("btn-clear-continue").addEventListener("click", onClearContinue);
 
   drawBustScene("title-scene", "neutral");
