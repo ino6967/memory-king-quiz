@@ -282,8 +282,9 @@ h1 {
 
 .hud {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
   margin-bottom: 18px;
 }
 .hud-label {
@@ -293,26 +294,15 @@ h1 {
   color: var(--muted);
   white-space: nowrap;
 }
-.timer-track {
-  flex: 1;
-  height: 4px;
-  background: var(--edge-soft);
-  position: relative;
-  overflow: hidden;
-}
-.timer-fill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
-  transition: width 1s linear;
-}
 .timer-text {
-  width: 2.6em;
-  text-align: right;
   color: var(--gold-bright);
   font-family: "Cinzel", serif;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
+}
+
+.btn-memorized {
+  margin-top: 20px;
 }
 
 .board-heading {

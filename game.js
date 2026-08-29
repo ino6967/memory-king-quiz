@@ -44,7 +44,7 @@ let stageIndex = 0;
 // --- player settings (persisted per-browser; retry pacing only) ---
 
 const SETTINGS_KEY = "memoria-quiz-settings";
-const DEFAULT_SETTINGS = { reMemorizeOnRetry: true, memorizeSecondsOverride: null };
+const DEFAULT_SETTINGS = { reMemorizeOnRetry: true };
 
 function loadSettings() {
   try {
@@ -69,24 +69,14 @@ let settings = loadSettings();
 
 function applySettingsToInputs() {
   const checkbox = document.getElementById("opt-rememorize");
-  const secondsInput = document.getElementById("opt-memorize-seconds");
   checkbox.checked = settings.reMemorizeOnRetry;
-  secondsInput.value = settings.memorizeSecondsOverride ?? "";
-  secondsInput.disabled = !settings.reMemorizeOnRetry;
 }
 
 function wireSettingsInputs() {
   const checkbox = document.getElementById("opt-rememorize");
-  const secondsInput = document.getElementById("opt-memorize-seconds");
   applySettingsToInputs();
   checkbox.addEventListener("change", () => {
     settings.reMemorizeOnRetry = checkbox.checked;
-    secondsInput.disabled = !checkbox.checked;
-    saveSettings(settings);
-  });
-  secondsInput.addEventListener("change", () => {
-    const v = parseInt(secondsInput.value, 10);
-    settings.memorizeSecondsOverride = Number.isFinite(v) && v > 0 ? v : null;
     saveSettings(settings);
   });
 }
@@ -133,27 +123,31 @@ function renderBoard(stage) {
   }
 }
 
+let memorizePhaseStage = null;
+
 function startMemoryPhase(stage) {
   renderBoard(stage);
   paintBoardScene();
   showScreen("board");
-  const total = DEV_MODE ? 5 : settings.memorizeSecondsOverride || stage.memorizeSeconds;
-  let remaining = total;
-  const fill = document.getElementById("timer-fill");
-  const text = document.getElementById("timer-text");
-  fill.style.width = "100%";
-  text.textContent = String(remaining);
+  memorizePhaseStage = stage;
+
+  let elapsed = 0;
+  const text = document.getElementById("elapsed-text");
+  text.textContent = String(elapsed);
 
   clearInterval(timerHandle);
   timerHandle = setInterval(() => {
-    remaining -= 1;
-    fill.style.width = `${Math.max(0, (remaining / total) * 100)}%`;
-    text.textContent = String(Math.max(0, remaining));
-    if (remaining <= 0) {
-      clearInterval(timerHandle);
-      startQuizPhase(stage);
-    }
+    elapsed += 1;
+    text.textContent = String(elapsed);
   }, 1000);
+}
+
+function confirmMemorized() {
+  if (!memorizePhaseStage) return;
+  clearInterval(timerHandle);
+  const stage = memorizePhaseStage;
+  memorizePhaseStage = null;
+  startQuizPhase(stage);
 }
 
 // --- question templates ---
@@ -293,6 +287,34 @@ function drawKingSprite(ctx, cx, topY, mood, scale) {
     ctx.fillRect(cx + s(3), topY + s(5), s(2), s(2));
     ctx.fillRect(cx - s(3), topY + s(10), s(6), s(2));
   }
+}
+
+function drawHeroSprite(ctx, cx, footY, walkFrame) {
+  const legColor = "#2c2c3a";
+  const tunic = "#3f6b4a";
+  const hair = "#5a3a22";
+  const strap = "#8a5f2d";
+
+  ctx.fillStyle = legColor;
+  if (walkFrame % 2 === 0) {
+    ctx.fillRect(cx - 4, footY - 6, 3, 6);
+    ctx.fillRect(cx + 1, footY - 5, 3, 5);
+  } else {
+    ctx.fillRect(cx - 4, footY - 5, 3, 5);
+    ctx.fillRect(cx + 1, footY - 6, 3, 6);
+  }
+
+  ctx.fillStyle = tunic;
+  ctx.fillRect(cx - 5, footY - 16, 10, 11);
+
+  ctx.fillStyle = strap;
+  ctx.fillRect(cx - 5, footY - 8, 10, 2);
+
+  ctx.fillStyle = PX.skin;
+  ctx.fillRect(cx - 4, footY - 23, 8, 7);
+
+  ctx.fillStyle = hair;
+  ctx.fillRect(cx - 4, footY - 24, 8, 3);
 }
 
 function drawThroneScene(ctx, w, h, mood) {
@@ -474,16 +496,44 @@ function skipTypewriter(el) {
 
 let introState = null;
 
-function paintIntroScene() {
+function playApproach() {
   const canvas = document.getElementById("intro-scene");
-  if (!canvas) return;
-  drawThroneScene(canvas.getContext("2d"), canvas.width, canvas.height, "neutral");
+  if (!canvas) return Promise.resolve();
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  const footY = h - 4;
+  const startX = 16;
+  const endX = w / 2 - 22;
+
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    drawThroneScene(ctx, w, h, "neutral");
+    drawHeroSprite(ctx, endX, footY, 0);
+    return Promise.resolve();
+  }
+
+  const duration = DEV_MODE ? 150 : 1100;
+  return new Promise((resolve) => {
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const x = startX + (endX - startX) * t;
+      drawThroneScene(ctx, w, h, "neutral");
+      drawHeroSprite(ctx, x, footY, Math.floor(now / 150));
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
 }
 
 async function playIntro() {
   introState = { lines: DB.kingLines.opening, index: 0, typing: false };
-  paintIntroScene();
   showScreen("intro");
+  await playApproach();
   await showIntroLine();
 }
 
@@ -654,6 +704,7 @@ async function init() {
   });
   document.getElementById("intro-line").addEventListener("click", advanceIntro);
   document.getElementById("btn-intro-skip").addEventListener("click", finishIntro);
+  document.getElementById("btn-memorized").addEventListener("click", confirmMemorized);
   document.getElementById("btn-retry").addEventListener("click", retryGame);
   document.getElementById("btn-clear-continue").addEventListener("click", onClearContinue);
 

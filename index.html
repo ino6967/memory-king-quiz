@@ -34,10 +34,6 @@
           <input type="checkbox" id="opt-rememorize" checked />
           <span>リトライ時に記憶ボードを再表示する</span>
         </label>
-        <label class="settings-row" id="opt-time-row">
-          <span>記憶時間の上書き(秒・空欄で既定値)</span>
-          <input type="number" id="opt-memorize-seconds" min="5" max="180" placeholder="既定" />
-        </label>
       </div>
     </section>
 
@@ -56,14 +52,15 @@
       </div>
       <div class="hud">
         <span class="hud-label">記憶せよ</span>
-        <div class="timer-track"><div id="timer-fill" class="timer-fill"></div></div>
-        <span id="timer-text" class="timer-text">60</span>
+        <span id="elapsed-text" class="timer-text">0</span>
+        <span class="hud-label">秒経過</span>
       </div>
       <div class="board-heading">
         <span id="stage-tag" class="stage-tag">STAGE 1</span>
         <h1 id="board-title">王家の人々</h1>
       </div>
       <div id="board-people" class="board-people"></div>
+      <button id="btn-memorized" class="btn btn-memorized">覚えた!</button>
     </section>
 
     <section id="screen-king" class="screen">
