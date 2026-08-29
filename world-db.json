@@ -36,6 +36,13 @@
       "抵抗、か。……懐かしい響きじゃ。",
       "記憶とは、都合よく作れるものよ。",
       "そなたも、いずれ都合よく忘れられような。"
+    ],
+    "opening": [
+      "おお、よく来た勇者よ……",
+      "魔王討伐の旅に出る前に、いま一度確かめておきたいことがある。",
+      "勇者よ、当然我が王国については何でも知っているな?",
+      "王への忠誠、そして勇者としての資質……その両方を、ここで示してもらおう。",
+      "さあ、心して臨むがよい。"
     ]
   },
   "people": {
@@ -125,7 +132,8 @@
       "motherId": "magdalena",
       "spouseId": null,
       "childIds": [],
-      "siblingIds": ["aldin", "godwin"]
+      "siblingIds": ["aldin", "godwin"],
+      "notes": "彼女の名は、近年の年代記にはほとんど登場しない。"
     },
     "oswald": {
       "id": "oswald",
@@ -136,7 +144,8 @@
       "motherId": null,
       "spouseId": "magdalena",
       "childIds": ["aldin", "godwin", "isabella"],
-      "siblingIds": []
+      "siblingIds": [],
+      "notes": "王位を退いた経緯は、正史にはあまり記されていない。"
     },
     "magdalena": {
       "id": "magdalena",

@@ -159,6 +159,77 @@ h1 {
   border: 1px solid var(--edge);
 }
 .btn-ghost:hover { border-color: var(--gold); box-shadow: none; background: rgba(201,162,75,.06); }
+.btn-small {
+  width: auto;
+  padding: 8px 16px;
+  font-size: .78rem;
+  margin: 0 auto;
+  display: flex;
+}
+
+/* --- title settings --- */
+
+.settings {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--edge-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  font-size: .76rem;
+  color: var(--muted);
+}
+.settings-row input[type="checkbox"] {
+  order: -1;
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.settings-row input[type="number"] {
+  width: 5em;
+  padding: 6px 8px;
+  background: var(--ink-2);
+  border: 1px solid var(--edge-soft);
+  color: var(--parchment);
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  font-size: .8rem;
+}
+.settings-row input[type="number"]:disabled { opacity: .4; }
+.settings-row input:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+
+/* --- intro monologue --- */
+
+.king-line-tap {
+  display: block;
+  width: 100%;
+  font-family: "Shippori Mincho", serif;
+  text-align: left;
+  cursor: pointer;
+}
+.advance-indicator {
+  text-align: center;
+  color: var(--gold);
+  font-size: .8rem;
+  margin: -8px 0 16px;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.advance-indicator.show { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .advance-indicator.show { animation: bob 1s ease-in-out infinite; }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
 
 /* --- pixel scene canvases --- */
 
@@ -287,6 +358,15 @@ h1 {
   line-height: 1.6;
 }
 .person-card .rel span { color: var(--muted); }
+.person-card .notes {
+  font-size: .74rem;
+  font-style: italic;
+  color: var(--edge);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--edge-soft);
+  line-height: 1.6;
+}
 
 /* --- king room --- */
 

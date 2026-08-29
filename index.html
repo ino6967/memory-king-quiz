@@ -28,6 +28,26 @@
         王の御前にて答えを違えれば――沙汰は下る。
       </p>
       <button id="btn-start" class="btn">試練をはじめる</button>
+
+      <div class="settings">
+        <label class="settings-row">
+          <input type="checkbox" id="opt-rememorize" checked />
+          <span>リトライ時に記憶ボードを再表示する</span>
+        </label>
+        <label class="settings-row" id="opt-time-row">
+          <span>記憶時間の上書き(秒・空欄で既定値)</span>
+          <input type="number" id="opt-memorize-seconds" min="5" max="180" placeholder="既定" />
+        </label>
+      </div>
+    </section>
+
+    <section id="screen-intro" class="screen">
+      <div id="intro-scene-frame" class="scene-frame">
+        <canvas id="intro-scene" class="scene-canvas" width="220" height="140"></canvas>
+      </div>
+      <button id="intro-line" type="button" class="king-line king-line-tap">王「」</button>
+      <div id="intro-indicator" class="advance-indicator">▼</div>
+      <button id="btn-intro-skip" class="btn btn-ghost btn-small">スキップ</button>
     </section>
 
     <section id="screen-board" class="screen">
